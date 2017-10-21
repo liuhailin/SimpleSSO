@@ -1,0 +1,14 @@
+server:
+  port: 9000
+  session:
+    timeout: 1 #设置session 1分钟
+
+spring:
+  application:
+    name: sso-server
+  mvc:
+    static-path-pattern: /static/**
+    favicon:
+      enabled: false
+    servlet:
+      load-on-startup: 1

@@ -1,0 +1,14 @@
+server:
+  port: 8000
+  session:
+    timeout: 1 #设置session 1分钟
+
+spring:
+  application:
+    name: biz-app-A
+  mvc:
+    static-path-pattern: /static/**
+    favicon:
+      enabled: false
+    servlet:
+      load-on-startup: 1
