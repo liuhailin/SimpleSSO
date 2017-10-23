@@ -22,7 +22,7 @@ public class BootBizApp_A {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         filterRegistrationBean.setFilter( filter );
         filterRegistrationBean.addUrlPatterns( "/*" );
-        filterRegistrationBean.addInitParameter( "sso-server-host", "localhost:9000" );
+        filterRegistrationBean.addInitParameter( "sso-server-host", "sso.com:9000" );
         filterRegistrationBean.setName( "loginFilter" );
         return filterRegistrationBean;
     }

@@ -67,11 +67,11 @@ public class LoginController {
 
         log.info( "User [{}] is login success.", user.getUserName() );
 
-        String token = UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString().replace("-", "");
 
         Cookie tokenCookie = new Cookie("simple_sso", token);
 
-        tokenCookie.setDomain( "localhost" );
+        tokenCookie.setDomain( "sso.com" );
         tokenCookie.setHttpOnly( true );
         tokenCookie.setPath( "/" );
         tokenCookie.setMaxAge(10*60);

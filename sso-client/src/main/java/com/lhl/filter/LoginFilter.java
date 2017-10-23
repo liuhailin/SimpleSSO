@@ -68,6 +68,8 @@ public class LoginFilter implements Filter {
             ssoProtocol + "://" + ssoServerHost  + ssoContextPath + "?originUrl=" + originUrl );
     }
 
+    //始终认为token是有效的，实际上应该去sso验证。
+    //TODO
     private boolean requestSSOValidateToken(String authToken) {
         return true;
     }
