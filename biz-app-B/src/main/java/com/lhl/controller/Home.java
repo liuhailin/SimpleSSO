@@ -1,6 +1,10 @@
 package com.lhl.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
+import com.lhl.user.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -11,7 +15,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class Home {
 
     @GetMapping("/home")
-    public String home(){
+    public String home(HttpServletRequest request, ModelMap map){
+        User user = (User)request.getSession().getAttribute( "user_ses_key" );
+
+        map.put( "username",user.getUserName() );
         return "homepage";
     }
 

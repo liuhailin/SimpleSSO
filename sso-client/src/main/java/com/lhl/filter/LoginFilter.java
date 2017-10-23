@@ -11,8 +11,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.lhl.user.AuthInfo;
 import com.lhl.user.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Liu Hailin
@@ -26,13 +30,17 @@ public class LoginFilter implements Filter {
 
     private String ssoProtocol;
 
-    private String ssoContextPath = "/sso/auth";
+    private String ssoLoginContextPath = "/sso/login";
+    private String ssoAuthContextPath = "/sso/auth";
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         ssoServerHost = filterConfig.getInitParameter( "sso-server-host" );
         ssoProtocol = filterConfig.getInitParameter( "sso-protocol" );
-        if(StringUtils.isEmpty( ssoProtocol )){
+        if (StringUtils.isEmpty( ssoProtocol )) {
             ssoProtocol = "http";
         }
     }
@@ -43,20 +51,23 @@ public class LoginFilter implements Filter {
         if (servletRequest instanceof HttpServletRequest) {
             HttpServletRequest request = (HttpServletRequest)servletRequest;
             HttpServletResponse response = (HttpServletResponse)servletResponse;
-            String authToken = request.getParameter( "token" );
-            if(StringUtils.isEmpty( authToken )){
-                User user = (User)request.getSession().getAttribute( "user_ses_key" );
-                if (null == user) {
-                    redirctSSO( request, response );
-                    return;
-                }
+
+            User user = (User)request.getSession().getAttribute( USER_SESSION_KEY );
+            if (null != user) {
+                filterChain.doFilter( servletRequest, servletResponse );
+                return;
             }
-            //TODO 去sso验证toke合法
-            boolean isSafe = requestSSOValidateToken(authToken);
-            if(!isSafe){
+            String authToken = request.getParameter( "token" );
+            if (StringUtils.isEmpty( authToken )) {
                 redirctSSO( request, response );
                 return;
             }
+            AuthInfo authInfo = requestSSOValidateToken( authToken );
+            if (null == authInfo || !authInfo.isPass()) {
+                redirctSSO( request, response );
+                return;
+            }
+            request.getSession().setAttribute( USER_SESSION_KEY, authInfo.getUser() );
         }
 
         filterChain.doFilter( servletRequest, servletResponse );
@@ -65,13 +76,14 @@ public class LoginFilter implements Filter {
     private void redirctSSO(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String originUrl = request.getRequestURL().toString();
         response.sendRedirect(
-            ssoProtocol + "://" + ssoServerHost  + ssoContextPath + "?originUrl=" + originUrl );
+            ssoProtocol + "://" + ssoServerHost + ssoLoginContextPath + "?originUrl=" + originUrl );
     }
 
-    //始终认为token是有效的，实际上应该去sso验证。
-    //TODO
-    private boolean requestSSOValidateToken(String authToken) {
-        return true;
+    private AuthInfo requestSSOValidateToken(String authToken) {
+        ResponseEntity<AuthInfo> infoResponseEntity = restTemplate.getForEntity(
+            ssoProtocol + "://" + ssoServerHost + ssoAuthContextPath + "?authToken={authToken}", AuthInfo.class,
+            authToken );
+        return infoResponseEntity.getBody();
     }
 
     @Override

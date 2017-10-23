@@ -11,10 +11,10 @@ import org.springframework.context.annotation.Bean;
  * @create 2017-10-20 下午3:10
  **/
 @SpringBootApplication
-public class BootBizApp_A {
+public class BootBizAppB {
 
     public static void main(String[] args) {
-        SpringApplication.run( BootBizApp_A.class, args );
+        SpringApplication.run( BootBizAppB.class, args );
     }
 
     @Bean
