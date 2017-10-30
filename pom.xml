@@ -18,6 +18,7 @@
         <module>sso-server</module>
         <module>biz-app-A</module>
         <module>biz-app-B</module>
+        <module>sso-client-jwt</module>
     </modules>
 
     <dependencies>
